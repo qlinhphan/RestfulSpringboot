@@ -37,4 +37,8 @@ public class UserService {
         Specification<User> spec = this.userSpecification.likeNameUser(name);
         return this.userRepository.findAll(spec, pageable);
     }
+
+    public User findUserByEmail(String email) {
+        return this.userRepository.findByEmail(email);
+    }
 }

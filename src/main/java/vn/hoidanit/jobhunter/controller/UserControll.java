@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.service.UserService;
-import vn.hoidanit.jobhunter.service.error.IdInvalidExceptionService;
+import vn.hoidanit.jobhunter.service.error.IdInvalidService;
 
 import java.util.List;
 
@@ -62,10 +62,12 @@ public class UserControll {
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<User> findUserById(@PathVariable("id") long id) throws IdInvalidExceptionService {
+    public ResponseEntity<User> findUserById(@PathVariable("id") long id) throws IdInvalidService {
+
         if (id > 1500) {
-            throw new IdInvalidExceptionService("KHONG DUOC TRUYEN ID LON HON 1500");
+            throw new IdInvalidService("Can not transfer this Id, because it is greather than 1500");
         }
+
         User user = this.userService.findUserById(id);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }

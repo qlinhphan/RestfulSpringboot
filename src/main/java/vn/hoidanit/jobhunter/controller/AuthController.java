@@ -2,6 +2,7 @@ package vn.hoidanit.jobhunter.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.dto.LoginDTO;
 
 import org.springframework.http.ResponseEntity;
@@ -21,15 +22,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginDTO> loginUser(@RequestBody LoginDTO loginDTO) {
-        // nap input gom username, pass vao spring security
+    public ResponseEntity<LoginDTO> postLogin(@Valid @RequestBody LoginDTO loginDTO) {
+
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginDTO.getUsername(), loginDTO.getPassword());
 
         // xac thuc nguoi dung, can viet ham loaduserbyusername
         Authentication authentication = authenticationManagerBuilder.getObject()
                 .authenticate(authenticationToken);
-        return ResponseEntity.ok().body(loginDTO);
+
+        return ResponseEntity.ok(loginDTO);
     }
 
 }

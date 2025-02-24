@@ -3,6 +3,7 @@ package vn.hoidanit.jobhunter.domain.formResponse;
 public class RestResponse<T> {
     private int sttErr;
     private String err;
+
     private Object message;
     private T data;
 

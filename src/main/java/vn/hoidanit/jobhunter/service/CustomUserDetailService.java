@@ -7,15 +7,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.User;
 
 @Component("userDetailsService")
-public class UserDetailCustom implements UserDetailsService {
+public class CustomUserDetailService implements UserDetailsService {
 
     private UserService userService;
 
-    public UserDetailCustom(UserService userService) {
+    public CustomUserDetailService(UserService userService) {
         this.userService = userService;
     }
 
@@ -28,6 +29,7 @@ public class UserDetailCustom implements UserDetailsService {
                 us.getEmail(),
                 us.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+
     }
 
 }

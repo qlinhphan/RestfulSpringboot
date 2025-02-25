@@ -31,23 +31,24 @@ public class GlobalError {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(rest);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<RestResponse<Object>> validationError(MethodArgumentNotValidException ex) {
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseEntity<RestResponse<Object>> catchErr(MethodArgumentNotValidException ex) {
+        // Lay ra loi tai giao dien
         BindingResult rs = ex.getBindingResult();
-        List<FieldError> fieldErrors = rs.getFieldErrors();
+        List<FieldError> listErr = rs.getFieldErrors();
 
-        RestResponse<Object> restResponse = new RestResponse<Object>();
-        restResponse.setSttErr(HttpStatus.BAD_REQUEST.value());
-        restResponse.setErr(ex.getBody().getDetail());
+        RestResponse<Object> rest = new RestResponse<Object>();
+        rest.setSttErr(HttpStatus.BAD_REQUEST.value());
+        rest.setErr(ex.getBody().getDetail());
 
         List<String> errs = new ArrayList<String>();
-        for (FieldError f : fieldErrors) {
+        for (FieldError f : listErr) {
             errs.add(f.getDefaultMessage());
         }
 
-        restResponse.setMessage(errs.size() > 1 ? errs : errs.get(0));
+        rest.setMessage(errs.size() > 0 ? errs : errs.get(0));
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(restResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(rest);
     }
 
 }

@@ -3,7 +3,9 @@ package vn.hoidanit.jobhunter.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import vn.hoidanit.jobhunter.domain.dto.AccessToken;
 import vn.hoidanit.jobhunter.domain.dto.LoginDTO;
+import vn.hoidanit.jobhunter.util.SecurityUtil;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,13 +18,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class AuthController {
 
     private AuthenticationManagerBuilder authenticationManagerBuilder;
+    private SecurityUtil securityUtil;
 
-    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder) {
+    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.securityUtil = securityUtil;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginDTO> postLogin(@Valid @RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<AccessToken> postLogin(@Valid @RequestBody LoginDTO loginDTO) {
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginDTO.getUsername(), loginDTO.getPassword());
@@ -31,7 +35,14 @@ public class AuthController {
         Authentication authentication = authenticationManagerBuilder.getObject()
                 .authenticate(authenticationToken);
 
-        return ResponseEntity.ok(loginDTO);
+        // create a token (neu nguoi dung dang nhap thanh cong spring secu se ko luu
+        // thong tin nguoi dung)
+        String access_token = this.securityUtil.createToken(authentication);
+
+        AccessToken a = new AccessToken();
+        a.setToken(access_token);
+
+        return ResponseEntity.ok(a);
     }
 
 }

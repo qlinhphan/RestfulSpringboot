@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpResponse;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.servlet.http.HttpServletResponse;
+import vn.hoidanit.jobhunter.domain.dto.LoginDTO;
 import vn.hoidanit.jobhunter.domain.formResponse.RestResponse;
 
 @RestControllerAdvice
@@ -22,7 +24,6 @@ public class GlobalError {
 
     @ExceptionHandler(value = IdInvalidService.class)
     public ResponseEntity<Object> handleBlogAlreadyExistsException(IdInvalidService invalidService) {
-
         RestResponse<Object> rest = new RestResponse<Object>();
         rest.setSttErr(HttpStatus.BAD_REQUEST.value());
         rest.setMessage("not this user !!");
@@ -32,23 +33,33 @@ public class GlobalError {
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<RestResponse<Object>> catchErr(MethodArgumentNotValidException ex) {
-        // Lay ra loi tai giao dien
+    public ResponseEntity<Object> handle(MethodArgumentNotValidException ex) {
+
         BindingResult rs = ex.getBindingResult();
-        List<FieldError> listErr = rs.getFieldErrors();
+        List<FieldError> er = rs.getFieldErrors();
 
-        RestResponse<Object> rest = new RestResponse<Object>();
-        rest.setSttErr(HttpStatus.BAD_REQUEST.value());
-        rest.setErr(ex.getBody().getDetail());
+        RestResponse<Object> rr = new RestResponse<Object>();
+        rr.setErr(ex.getBody().getDetail());
+        rr.setSttErr(HttpStatus.BAD_REQUEST.value());
 
-        List<String> errs = new ArrayList<String>();
-        for (FieldError f : listErr) {
-            errs.add(f.getDefaultMessage());
+        List<String> errors = new ArrayList<>();
+        for (FieldError e : er) {
+            errors.add(e.getDefaultMessage());
         }
 
-        rest.setMessage(errs.size() > 0 ? errs : errs.get(0));
+        rr.setMessage(errors);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(rest);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(rr);
+    }
+
+    @ExceptionHandler(value = BadCredentialsException.class)
+    public ResponseEntity<RestResponse<Object>> handleBadcridential(BadCredentialsException ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setSttErr(HttpStatus.BAD_REQUEST.value());
+        res.setErr("have some errors");
+        res.setMessage("Email or Password is not true");
+        return ResponseEntity.badRequest().body(res);
+
     }
 
 }

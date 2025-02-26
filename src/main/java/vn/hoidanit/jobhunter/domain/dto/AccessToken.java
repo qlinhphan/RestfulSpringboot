@@ -1,15 +1,14 @@
 package vn.hoidanit.jobhunter.domain.dto;
 
 public class AccessToken {
-
-    private String Token;
+    private String token;
 
     public String getToken() {
-        return Token;
+        return token;
     }
 
     public void setToken(String token) {
-        Token = token;
+        this.token = token;
     }
 
 }

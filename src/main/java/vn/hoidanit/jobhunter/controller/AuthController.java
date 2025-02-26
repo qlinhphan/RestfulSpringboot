@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.dto.AccessToken;
 import vn.hoidanit.jobhunter.domain.dto.LoginDTO;
+import vn.hoidanit.jobhunter.domain.formResponse.RestResponse;
 import vn.hoidanit.jobhunter.util.SecurityUtil;
 
 import org.springframework.http.ResponseEntity;
@@ -37,12 +38,13 @@ public class AuthController {
 
         // create a token (neu nguoi dung dang nhap thanh cong spring secu se ko luu
         // thong tin nguoi dung)
-        String access_token = this.securityUtil.createToken(authentication);
 
-        AccessToken a = new AccessToken();
-        a.setToken(access_token);
+        String token = this.securityUtil.createToken(authentication);
+        AccessToken at = new AccessToken();
+        at.setToken(token);
 
-        return ResponseEntity.ok(a);
+        return ResponseEntity.ok(at);
+
     }
 
 }

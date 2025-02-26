@@ -3,10 +3,10 @@ package vn.hoidanit.jobhunter.domain.dto;
 import jakarta.validation.constraints.NotBlank;
 
 public class LoginDTO {
-    @NotBlank(message = "you have to write USERNAME")
+    @NotBlank(message = "You have to fill USERNAME")
     private String username;
 
-    @NotBlank(message = "you have to write PASSWORD")
+    @NotBlank(message = "You have to fill PASSWORD")
     private String password;
 
     public String getUsername() {

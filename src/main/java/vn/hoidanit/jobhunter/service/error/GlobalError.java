@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
@@ -58,6 +59,16 @@ public class GlobalError {
         res.setSttErr(HttpStatus.BAD_REQUEST.value());
         res.setErr("have some errors");
         res.setMessage("Email or Password is not true");
+        return ResponseEntity.badRequest().body(res);
+
+    }
+
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    public ResponseEntity<RestResponse<Object>> handleBadcridential(HttpMessageNotReadableException ex) {
+        RestResponse<Object> res = new RestResponse<Object>();
+        res.setSttErr(HttpStatus.BAD_REQUEST.value());
+        res.setErr("have some errors");
+        res.setMessage("you can't this gender, just (MALE, FEMALE, OTHER)");
         return ResponseEntity.badRequest().body(res);
 
     }

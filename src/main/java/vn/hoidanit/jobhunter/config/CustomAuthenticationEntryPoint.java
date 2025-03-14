@@ -1,6 +1,7 @@
 package vn.hoidanit.jobhunter.config;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -14,16 +15,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import vn.hoidanit.jobhunter.domain.formResponse.RestResponse;
-import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class CustomAuthenticationEntrypoint implements AuthenticationEntryPoint {
 
-    private final AuthenticationEntryPoint delegate = new BearerTokenAuthenticationEntryPoint();
+    AuthenticationEntryPoint delegate = new BearerTokenAuthenticationEntryPoint();
 
-    private final ObjectMapper mapper;
+    private ObjectMapper mapper;
 
-    public CustomAuthenticationEntryPoint(ObjectMapper mapper) {
+    public CustomAuthenticationEntrypoint(ObjectMapper mapper) {
         this.mapper = mapper;
     }
 
@@ -31,16 +31,17 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {
         this.delegate.commence(request, response, authException);
-        response.setContentType("application/json;charset=UTF-8");
 
         RestResponse<Object> res = new RestResponse<Object>();
         res.setSttErr(HttpStatus.UNAUTHORIZED.value());
-        res.setMessage(authException.getCause().getMessage());
-        res.setMessage(
-                "Token không hợp lệ (hết hạn, không đúng định dạng, hoặc không truyền JWT ở header)...");
 
-        mapper.writeValue(response.getWriter(), res);
+        String errMess = Optional.ofNullable(authException.getCause())
+                .map(Throwable::getMessage).orElse(authException.getMessage());
+        res.setMessage(errMess);
+        res.setErr(
+                "The token is invalid");
 
+        mapper.writeValue(response.getWriter(), errMess);
     }
 
 }

@@ -2,6 +2,7 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.2.4"
 	id("io.spring.dependency-management") version "1.1.4"
+	id("io.freefair.lombok") version "8.6"
 }
 
 group = "vn.hoidanit"
@@ -29,7 +30,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
     implementation("org.apache.commons:commons-lang3:3.12.0")
-
+    implementation("com.turkraft.springfilter:jpa:3.1.9")
 
 	annotationProcessor("org.hibernate:hibernate-jpamodelgen:5.6.10.Final")
 

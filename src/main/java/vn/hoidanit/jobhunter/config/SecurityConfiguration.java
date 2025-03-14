@@ -43,21 +43,24 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
-            CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
+            CustomAuthenticationEntrypoint customAuthenticationEntryPoint) throws Exception {
         http
                 .csrf(c -> c.disable())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/login").permitAll()
+                        .requestMatchers("/", "/login", "/users").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
 
-                ) // tu dong them 1 lop filter bearerTokenAuthentication
-                .exceptionHandling(
-                        Exceptions -> Exceptions
-                                .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint()) // handle 401
-                                .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) // handle 403(hien tai chua
-                                                                                            // dung den)
+                )
+                // tu dong them 1 lop filter bearerTokenAuthentication
+                // .exceptionHandling(
+                // Exceptions -> Exceptions
+                // .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint()) //
+                // handle 401
+                // .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) // handle
+                // 403(hien tai chua
+                // // dung den)
 
                 .formLogin(f -> f.disable())
                 .sessionManagement(session -> session

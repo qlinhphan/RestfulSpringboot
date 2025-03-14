@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import jakarta.servlet.http.HttpServletResponse;
 import vn.hoidanit.jobhunter.domain.formResponse.RestResponse;
+import vn.hoidanit.jobhunter.util.anotation.AnotationRes;
 
 @RestControllerAdvice
 public class ResponseData implements ResponseBodyAdvice {
@@ -25,15 +26,20 @@ public class ResponseData implements ResponseBodyAdvice {
         HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
         int stt = servletResponse.getStatus();
         System.out.println("INPUT ID: " + stt);
+        if (body instanceof String) {
+            return body;
+        }
         if (stt >= 400) {
             return body;
         } else {
             RestResponse<Object> rest = new RestResponse<Object>();
             rest.setSttErr(stt);
-            rest.setMessage("Data are called success");
+
+            AnotationRes mess = returnType.getMethodAnnotation(AnotationRes.class);
+
+            rest.setMessage(mess.value());
             rest.setErr("No-err");
             rest.setData(body);
-
             return rest;
         }
     }

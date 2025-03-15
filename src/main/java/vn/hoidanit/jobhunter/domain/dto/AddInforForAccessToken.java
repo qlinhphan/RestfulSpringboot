@@ -1,6 +1,6 @@
 package vn.hoidanit.jobhunter.domain.dto;
 
-public class AddInforForToken {
+public class AddInforForAccessToken {
     private long id;
     private String email;
     private String name;

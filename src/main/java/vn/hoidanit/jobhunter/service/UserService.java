@@ -18,7 +18,6 @@ public class UserService {
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-
     }
 
     public User saveUser(User us) {
@@ -49,9 +48,9 @@ public class UserService {
         return this.userRepository.findAll(spe, pageable);
     }
 
-    public void updateRefreshTokenForUser(String email, String token) {
+    public void updateRefreshTokenForUser(String refreshToken, String email) {
         User us = this.findUserByEmail(email);
-        us.setRefreshToken(token);
+        us.setRefreshToken(refreshToken);
         this.saveUser(us);
     }
 }

@@ -5,33 +5,30 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.dto.AccessToken;
-import vn.hoidanit.jobhunter.domain.dto.AddInforForToken;
+import vn.hoidanit.jobhunter.domain.dto.AddInforForAccessToken;
 import vn.hoidanit.jobhunter.domain.dto.LoginDTO;
 import vn.hoidanit.jobhunter.domain.formResponse.RestResponse;
 import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.util.SecurityUtil;
 import vn.hoidanit.jobhunter.util.anotation.AnotationRes;
 
-import java.net.http.HttpHeaders;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseCookie.ResponseCookieBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
+@RequestMapping("/api")
 public class AuthController {
+
+    private final CompanyController companyController;
 
     private AuthenticationManagerBuilder authenticationManagerBuilder;
     private SecurityUtil securityUtil;
@@ -41,10 +38,11 @@ public class AuthController {
     private long jwtExpirationRefresToken;
 
     public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil,
-            UserService userService) {
+            UserService userService, CompanyController companyController) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
         this.userService = userService;
+        this.companyController = companyController;
     }
 
     @PostMapping("/login")
@@ -65,38 +63,55 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         AccessToken at = new AccessToken();
         at.setToken(token);
-        User us = this.userService.findUserByEmail(loginDTO.getUsername());
-        AddInforForToken add = new AddInforForToken();
-        if (us != null) {
 
-            add.setId(us.getId());
-            add.setName(us.getName());
-            add.setEmail(us.getEmail());
-            at.setAddInforForToken(add);
+        User us = this.userService.findUserByEmail(loginDTO.getUsername());
+        if (us != null) {
+            AddInforForAccessToken aff = new AddInforForAccessToken();
+            aff.setId(us.getId());
+            aff.setName(us.getName());
+            aff.setEmail(us.getEmail());
+            at.setAddInforForAccessToken(aff);
         }
 
-        String refreshToken = this.securityUtil.createRefreshToken(loginDTO.getUsername(), at);
+        String refresh_token = this.securityUtil.createRefreshToken(loginDTO.getUsername(), at);
 
-        this.userService.updateRefreshTokenForUser(loginDTO.getUsername(), refreshToken);
+        this.userService.updateRefreshTokenForUser(refresh_token, loginDTO.getUsername());
 
-        ResponseCookie springCookie = ResponseCookie.from("user", refreshToken)
+        ResponseCookie springCookie = ResponseCookie.from("user", refresh_token)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
                 .maxAge(jwtExpirationRefresToken)
                 .build();
 
-        return ResponseEntity.ok()
-                .header(org.springframework.http.HttpHeaders.SET_COOKIE, springCookie.toString())
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, springCookie.toString())
                 .build();
-
     }
 
-    @PostMapping("/log")
-    public ResponseEntity<String> postMethodName() {
-        // TODO: process POST request
+    @AnotationRes("api logout")
+    @PostMapping("/logout")
+    public ResponseEntity<RestResponse> postMethodName() {
+        String email = this.securityUtil.getCurrentUserLogin().get();
 
-        return ResponseEntity.ok("ok");
+        User us = this.userService.findUserByEmail(email);
+
+        this.userService.updateRefreshTokenForUser(null, email);
+
+        ResponseCookie deleteSpringCookie = ResponseCookie
+                .from("user", null)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, deleteSpringCookie.toString())
+                .build();
+
     }
 
 }

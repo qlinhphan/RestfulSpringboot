@@ -62,10 +62,11 @@ public class SecurityUtil {
                 .expiresAt(validity)
                 .subject(email) // chia khoa de dinh danh nguoi dung la ai -> luu email cua ho (vi
                                 // email cua moi nguoi la khac nhau va duy nhat)
-                .claim("user", at.getAddInforForToken()) // bo xung thong tin cho claim
+                .claim("Exactly information", at.getAddInforForAccessToken()) // bo xung thong tin cho claim
                 .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claimsSet)).getTokenValue();
     }
 

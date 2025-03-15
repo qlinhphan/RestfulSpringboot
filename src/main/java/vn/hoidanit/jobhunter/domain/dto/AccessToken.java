@@ -2,8 +2,7 @@ package vn.hoidanit.jobhunter.domain.dto;
 
 public class AccessToken {
     private String token;
-
-    private AddInforForToken addInforForToken;
+    private AddInforForAccessToken addInforForAccessToken;
 
     public String getToken() {
         return token;
@@ -13,12 +12,12 @@ public class AccessToken {
         this.token = token;
     }
 
-    public AddInforForToken getAddInforForToken() {
-        return addInforForToken;
+    public AddInforForAccessToken getAddInforForAccessToken() {
+        return addInforForAccessToken;
     }
 
-    public void setAddInforForToken(AddInforForToken addInforForToken) {
-        this.addInforForToken = addInforForToken;
+    public void setAddInforForAccessToken(AddInforForAccessToken addInforForAccessToken) {
+        this.addInforForAccessToken = addInforForAccessToken;
     }
 
 }

@@ -47,7 +47,7 @@ public class SecurityConfiguration {
         http
                 .csrf(c -> c.disable())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/login", "/users").permitAll()
+                        .requestMatchers("/", "/api/login", "/users").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
